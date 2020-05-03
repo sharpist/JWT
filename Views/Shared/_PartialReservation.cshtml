@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Reservation>
+@{ ViewBag.Title = "All Reservations"; }
+
+<h2>All Reservations</h2>
+<table class="table table-sm table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Start Location</th>
+            <th>End Location</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model) {
+            <tr>
+                <td>@r.Id</td>
+                <td>@r.Name</td>
+                <td>@r.StartLocation</td>
+                <td>@r.EndLocation</td>
+            </tr>
+        }
+    </tbody>
+</table>

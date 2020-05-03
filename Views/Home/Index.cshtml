@@ -1,0 +1,103 @@
+﻿@{ ViewBag.Title = "Login"; }
+
+<h2>Login</h2>
+
+<div id="messageDiv" style="display:none" class="alert alert-danger"></div>
+<table class="w-25 table table-striped table-bordered">
+    <tbody>
+        <tr>
+            <td>Username</td>
+            <td><input id="username" type="text" name="username" /></td>
+        </tr>
+        <tr>
+            <td>Password</td>
+            <td><input id="password" type="password" name="password" /></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button id="submit">Submit</button></td>
+        </tr>
+    </tbody>
+</table>
+
+<div id="processDiv" style="display: none">Processing...</div>
+<div id="reservation"></div>
+
+<script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // авторизация
+        $("#submit").click(function (e) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Token", "Account")",
+                data: { username: $("#username").val(), password: $("#password").val() },
+                dataType: "text",
+                success: function (result) {
+                    if (result != "Error") {
+                        // сохранение в хранилище sessionStorage маркера доступа
+                        sessionStorage.setItem("accessToken", JSON.parse(result).access_token);
+                        CallAPI();
+                    }
+                    else {
+                        $("#messageDiv").show();
+                        $("#messageDiv").html("Error");
+                    }
+                },
+                error: function (req, status, error) {
+                    alert(error);
+                }
+            });
+        });
+
+        // обращение к защищённому API
+        function CallAPI() {
+            const token = sessionStorage.getItem("accessToken");
+
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("Extract", "Reservation")",
+                // передача токена в заголовке
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                dataType: 'json',
+                success: function (result) {
+                    ShowData(result);
+                },
+                error: function (xhr, status, error) {
+                    alert(error);
+                },
+                // условный выход - простое удаление маркера доступа
+                complete: function complete() {
+                    sessionStorage.removeItem("accessToken");
+                }
+            });
+        };
+
+        // результирующий вывод
+        function ShowData(reservation) {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "@Url.Action("Show", "Home")",
+                data: JSON.stringify(reservation),
+                success: function (result) {
+                    $("#reservation").html(result)
+                    $("#messageDiv").hide();
+                },
+                error: function (req, status, error) {
+                    alert(error);
+                }
+            });
+        };
+
+        // состояние обработки
+        $(document).ajaxStart(function () {
+            $("#processDiv").show();
+        });
+        $(document).ajaxStop(function () {
+            $("#processDiv").hide();
+        });
+    });
+</script>
