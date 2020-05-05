@@ -50,7 +50,7 @@ namespace JWT.Controllers
             // ключ безопасности
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("secretkey_texqtgwxknlho"));
             // алгоритм хеширования (симметричный, для вычисления нужен один секретный ключ)
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
             var jwt = new JwtSecurityToken(
                 // заявки
@@ -66,7 +66,7 @@ namespace JWT.Controllers
 
             var response = new {
                 access_token = encodedJwt,
-                username = identity.Name
+                username     = identity.Name
             };
             return Json(response);
         }
