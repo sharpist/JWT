@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 
 namespace JWT
@@ -31,6 +32,8 @@ namespace JWT
                         ValidAudience            = "MyAuthClient",
                         // установка ключа безопасности
                         IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("secretkey_texqtgwxknlho")),
+                        // сдвиг часов при проверке времени
+                        ClockSkew                = TimeSpan.Zero,
                         // валидировать издателя токена
                         ValidateIssuer           = true,
                         // валидировать потребителя токена
@@ -38,7 +41,7 @@ namespace JWT
                         // валидировать ключ безопасности
                         ValidateIssuerSigningKey = true,
                         // валидировать время существования
-                        ValidateLifetime         = true
+                        ValidateLifetime         = true,
                     };
                 });
 
